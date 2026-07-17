@@ -16,24 +16,9 @@
 
 </p>
 
-<div class="grid grid-cols-5 gap-6">
+<div class="grid grid-cols-4 gap-6">
 
-    <div class="bg-white rounded shadow p-6 text-center">
-
-        <h2 class="text-xl font-bold">
-
-            Buildings
-
-        </h2>
-
-        <div class="text-5xl mt-4">
-
-            0
-
-        </div>
-
-    </div>
-
+   
     <div class="bg-white rounded shadow p-6 text-center">
 
         <h2 class="text-xl font-bold">
@@ -44,7 +29,7 @@
 
         <div class="text-5xl mt-4">
 
-            0
+            {{$floors}}
 
         </div>
 
@@ -60,7 +45,7 @@
 
         <div class="text-5xl mt-4">
 
-            0
+            {{$locations}}
 
         </div>
 
@@ -76,7 +61,7 @@
 
         <div class="text-5xl mt-4">
 
-            0
+            {{$waypoints}}
 
         </div>
 
@@ -92,7 +77,7 @@
 
         <div class="text-5xl mt-4">
 
-            0
+            {{$connections}}
 
         </div>
 

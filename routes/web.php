@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\FloorController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,5 +16,10 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/dashboard', [AdminController::class,'dashboard']);
 
     Route::post('/admin/logout', [AdminController::class,'logout']);
+
+
+
+    Route::get('/admin/floors',
+    [FloorController::class,'index']);
 
 });

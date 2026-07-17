@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Admin;
+use App\Models\Floor;
+use App\Models\Location;
+use App\Models\Waypoint;
+use App\Models\Connection;
+
 
 class AdminController extends Controller
 {
@@ -37,7 +42,12 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        return view('admin.dashboard');
+        $floors = Floor::all()->count();
+        $locations = Location::all()->count();
+        $waypoints = Waypoint::all()->count();
+        $connections = Connection::all()->count();
+
+        return view('admin.dashboard', compact('floors','locations','waypoints','connections'));
     }
 
     public function logout()

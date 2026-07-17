@@ -25,13 +25,12 @@
             Dashboard
         </a>
 
-        <a href="#" class="block px-6 py-3 hover:bg-gray-700">
-            Buildings
-        </a>
+        <a href="/admin/floors"
+            class="block px-6 py-3 hover:bg-gray-700">
 
-        <a href="#" class="block px-6 py-3 hover:bg-gray-700">
             Floors
-        </a>
+
+            </a>
 
         <a href="#" class="block px-6 py-3 hover:bg-gray-700">
             Campus Maps
