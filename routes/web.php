@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FloorController;
+use App\Http\Controllers\DesignerController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,7 +20,9 @@ Route::middleware('admin')->group(function () {
 
 
 
-    Route::get('/admin/floors',
-    [FloorController::class,'index']);
+    Route::get('/admin/floors', [FloorController::class,'index']);
+
+
+    Route::get('/admin/designer/{floor}', [DesignerController::class,'index']);
 
 });
