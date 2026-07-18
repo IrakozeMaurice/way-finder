@@ -12,6 +12,7 @@ Route::get('/', function () {
 Route::get('/admin/login', [AdminController::class,'login']);
 Route::post('/admin/login', [AdminController::class,'authenticate']);
 
+// ADMIN ROUTES
 Route::middleware('admin')->group(function () {
 
     Route::get('/admin/dashboard', [AdminController::class,'dashboard']);
@@ -24,5 +25,17 @@ Route::middleware('admin')->group(function () {
 
 
     Route::get('/admin/designer/{floor}', [DesignerController::class,'index']);
+
+
+
+    Route::get('/admin/designer/{floor}', [DesignerController::class, 'index']);
+
+    Route::post('/admin/designer/{floor}/save', [DesignerController::class, 'save'])
+        ->name('designer.save');
+
+    
+    Route::get('/admin/designer/{floor}/load',
+    [DesignerController::class,'load'])
+    ->name('designer.load');
 
 });

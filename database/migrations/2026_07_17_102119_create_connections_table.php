@@ -12,9 +12,11 @@ class CreateConnectionsTable extends Migration
 
             $table->id();
 
-            $table->foreignId('from_waypoint');
+            $table->foreignId('floor_id');
 
-            $table->foreignId('to_waypoint');
+            $table->foreignId('from_waypoint_id');
+
+            $table->foreignId('to_waypoint_id');
 
             $table->integer('distance');
 

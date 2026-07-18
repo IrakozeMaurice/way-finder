@@ -16,7 +16,7 @@
 
 </p>
 
-<div class="grid grid-cols-4 gap-6">
+<div class="grid grid-cols-5 gap-6">
 
    
     <div class="bg-white rounded shadow p-6 text-center">
@@ -30,6 +30,22 @@
         <div class="text-5xl mt-4">
 
             {{$floors}}
+
+        </div>
+
+    </div>
+
+    <div class="bg-white rounded shadow p-6 text-center">
+
+        <h2 class="text-xl font-bold">
+
+            Hallways
+
+        </h2>
+
+        <div class="text-5xl mt-4">
+
+            {{$hallways}}
 
         </div>
 

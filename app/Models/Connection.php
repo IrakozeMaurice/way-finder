@@ -6,13 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Connection extends Model
 {
-    protected $fillable=[
 
-        'from_waypoint',
-
-        'to_waypoint',
-
-        'distance'
-
+    protected $fillable = [
+        'floor_id',
+        'from_waypoint_id',
+        'to_waypoint_id',
+        'distance',
     ];
 }

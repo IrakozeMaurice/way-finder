@@ -3,8 +3,9 @@
 
 <head>
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <title>AR Way Finder</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>

@@ -9,6 +9,7 @@ use App\Models\Floor;
 use App\Models\Location;
 use App\Models\Waypoint;
 use App\Models\Connection;
+use App\Models\Hallway;
 
 
 class AdminController extends Controller
@@ -46,8 +47,9 @@ class AdminController extends Controller
         $locations = Location::all()->count();
         $waypoints = Waypoint::all()->count();
         $connections = Connection::all()->count();
+        $hallways = Hallway::all()->count();
 
-        return view('admin.dashboard', compact('floors','locations','waypoints','connections'));
+        return view('admin.dashboard', compact('floors','locations','waypoints','connections', 'hallways'));
     }
 
     public function logout()
