@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FloorController;
 use App\Http\Controllers\DesignerController;
+use App\Http\Controllers\NavigationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,8 +35,12 @@ Route::middleware('admin')->group(function () {
         ->name('designer.save');
 
     
-    Route::get('/admin/designer/{floor}/load',
-    [DesignerController::class,'load'])
-    ->name('designer.load');
+    Route::get('/admin/designer/{floor}/load', [DesignerController::class,'load'])
+        ->name('designer.load');
+
+    
+    // navigation
+    Route::get('/navigation/{start}/{end}', [NavigationController::class,'path'])
+        ->name('navigation.path');
 
 });
