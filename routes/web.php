@@ -10,8 +10,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/admin/login', [AdminController::class,'login']);
-Route::post('/admin/login', [AdminController::class,'authenticate']);
+    // navigation
+    Route::get('/navigation', [NavigationController::class,'index'])
+        ->name('navigation.index');
+
+    Route::get('/navigation/floor/{floor}', [NavigationController::class,'floor']);
+
+    // shortest path
+    Route::get('/navigation/{start}/{end}', [NavigationController::class,'path'])
+    ->name('navigation.path');
+
+
+    Route::get('/admin/login', [AdminController::class,'login']);
+    Route::post('/admin/login', [AdminController::class,'authenticate']);
 
 // ADMIN ROUTES
 Route::middleware('admin')->group(function () {
@@ -25,10 +36,6 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/floors', [FloorController::class,'index']);
 
 
-    Route::get('/admin/designer/{floor}', [DesignerController::class,'index']);
-
-
-
     Route::get('/admin/designer/{floor}', [DesignerController::class, 'index']);
 
     Route::post('/admin/designer/{floor}/save', [DesignerController::class, 'save'])
@@ -38,9 +45,5 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/designer/{floor}/load', [DesignerController::class,'load'])
         ->name('designer.load');
 
-    
-    // navigation
-    Route::get('/navigation/{start}/{end}', [NavigationController::class,'path'])
-        ->name('navigation.path');
 
 });

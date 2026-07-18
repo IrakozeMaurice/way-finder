@@ -37,4 +37,28 @@ class NavigationController extends Controller
         return response()->json($result);
 
     }
+
+
+    public function index()
+    {
+        $locations=\App\Models\Location::orderBy('name')->get();
+
+        return view('navigation.index', compact('locations'));
+    }
+
+
+    public function floor($floor)
+    {
+        return response()->json([
+
+            'hallways'=> \App\Models\Hallway::where('floor_id',$floor)->get(),
+
+            'waypoints'=> \App\Models\Waypoint::where('floor_id',$floor)->get(),
+
+            'locations'=> \App\Models\Location::where('floor_id',$floor)->get(),
+
+            'connections'=> \App\Models\Connection::where('floor_id',$floor)->get()
+
+        ]);
+    }
 }
