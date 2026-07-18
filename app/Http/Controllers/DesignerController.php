@@ -94,6 +94,28 @@ class DesignerController extends Controller
 
             foreach ($request->locations as $location) {
 
+                $nearestWaypoint = null;
+
+                $shortestDistance = PHP_FLOAT_MAX;
+
+                foreach ($request->waypoints as $waypoint) {
+
+                    $dx = $location['x'] - $waypoint['x'];
+
+                    $dy = $location['y'] - $waypoint['y'];
+
+                    $distance = sqrt(($dx * $dx) + ($dy * $dy));
+
+                    if ($distance < $shortestDistance) {
+
+                        $shortestDistance = $distance;
+
+                        $nearestWaypoint = $waypoint;
+
+                    }
+
+                }
+
                 Location::create([
 
                     'floor_id' => $floor->id,
@@ -104,7 +126,9 @@ class DesignerController extends Controller
 
                     'y' => $location['y'],
 
-                    'waypoint_id' => null
+                    'waypoint_id' => $nearestWaypoint
+                        ? $waypointMap[$nearestWaypoint['id']]
+                        : null
 
                 ]);
 
