@@ -8,6 +8,12 @@ let locations = [];
 let connections = [];
 let shortestPath = [];
 
+let startLocation = null;
+
+let destinationLocation = null;
+
+let totalDistance = 0;
+
 const GRID = 20;
 
 function drawGrid(){
@@ -97,15 +103,27 @@ function drawShortestPath(){
 
     }
 
-    ctx.strokeStyle="red";
+    ctx.strokeStyle="#adef44";
 
     ctx.lineWidth=5;
 
     for(let i=0;i<shortestPath.length-1;i++){
 
-        let from=waypoints.find(w=>w.id==shortestPath[i]);
+        let from=
 
-        let to=waypoints.find(w=>w.id==shortestPath[i+1]);
+        waypoints.find(function(w){
+
+            return w.id==shortestPath[i];
+
+        });
+
+        let to=
+
+        waypoints.find(function(w){
+
+            return w.id==shortestPath[i+1];
+
+        });
 
         if(!from || !to){
 
@@ -115,11 +133,146 @@ function drawShortestPath(){
 
         ctx.beginPath();
 
-        ctx.moveTo(from.x,from.y);
+        ctx.moveTo(
 
-        ctx.lineTo(to.x,to.y);
+            from.x,
+
+            from.y
+
+        );
+
+        ctx.lineTo(
+
+            to.x,
+
+            to.y
+
+        );
 
         ctx.stroke();
+
+        drawArrow(from,to);
+
+    }
+
+}
+
+function drawArrow(from,to){
+
+    const angle=Math.atan2(
+
+        to.y-from.y,
+
+        to.x-from.x
+
+    );
+
+    const midX=(from.x+to.x)/2;
+
+    const midY=(from.y+to.y)/2;
+
+    const size=12;
+
+    ctx.save();
+
+    ctx.translate(midX,midY);
+
+    ctx.rotate(angle);
+
+    ctx.fillStyle="red";
+
+    ctx.beginPath();
+
+    ctx.moveTo(size,0);
+
+    ctx.lineTo(-size,-6);
+
+    ctx.lineTo(-size,6);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+    ctx.restore();
+
+}
+
+function drawStartAndDestination(){
+
+    if(startLocation){
+
+        ctx.beginPath();
+
+        ctx.arc(
+
+            startLocation.x+65,
+
+            startLocation.y+20,
+
+            12,
+
+            0,
+
+            Math.PI*2
+
+        );
+
+        ctx.fillStyle="green";
+
+        ctx.fill();
+
+        ctx.fillStyle="white";
+
+        ctx.font="bold 12px Arial";
+
+        ctx.fillText(
+
+            "S",
+
+            startLocation.x+61,
+
+            startLocation.y+24
+
+        );
+
+    }
+
+
+    if(destinationLocation){
+
+        ctx.beginPath();
+
+        ctx.arc(
+
+            destinationLocation.x+65,
+
+            destinationLocation.y+20,
+
+            12,
+
+            0,
+
+            Math.PI*2
+
+        );
+
+        ctx.fillStyle="red";
+
+        ctx.fill();
+
+        ctx.fillStyle="white";
+
+        ctx.font="bold 12px Arial";
+
+        ctx.fillText(
+
+            "D",
+
+            destinationLocation.x+61,
+
+            destinationLocation.y+24
+
+        );
 
     }
 
@@ -136,5 +289,7 @@ function redraw(){
     drawWaypoints();
 
     drawLocations();
+
+    drawStartAndDestination();
 
 }

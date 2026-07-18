@@ -99,8 +99,19 @@ height="700">
 
 </div>
 
-<div id="navigationStatus" class="mt-4 text-lg font-semibold text-blue-600">
-    Navigation Ready
+<div
+id="navigationStatus"
+class="mt-4 bg-blue-50 border border-blue-200 rounded p-4">
+
+<b>Navigation Ready</b>
+
+<p class="text-gray-600 mt-2">
+
+Select a start location and destination,
+then click <b>Navigate</b>.
+
+</p>
+
 </div>
 
 <script src="{{ asset('js/navigation.js') }}"></script>
@@ -137,45 +148,77 @@ height="700">
 
 <script>
 
-    document
-    .getElementById("navigateButton")
-    .onclick=function(){
+document.getElementById("navigateButton").onclick = function () {
 
-    let start=
+    let start = parseInt(document.getElementById("start").value);
 
-    document
-    .getElementById("start")
-    .value;
+    let destination = parseInt(document.getElementById("destination").value);
 
-    let destination=
+    startLocation = locations.find(function(location){
 
-    document
-    .getElementById("destination")
-    .value;
-
-    fetch("/navigation/"+start+"/"+destination)
-
-    .then(response=>response.json())
-
-    .then(data=>{
-
-    shortestPath=data.path;
-
-    redraw();
-
-    document
-    .getElementById("navigationStatus")
-    .innerHTML=
-
-    "✓ Route Found ("+
-
-    data.distance+
-
-    " steps)";
+        return location.id == start;
 
     });
 
-    };
+    destinationLocation = locations.find(function(location){
+
+        return location.id == destination;
+
+    });
+
+    fetch("/navigation/" + start + "/" + destination)
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        shortestPath = data.path;
+
+        totalDistance = data.distance;
+
+        redraw();
+
+        document.getElementById("navigationStatus").innerHTML = `
+
+        <div class="bg-blue-50 border rounded p-4">
+
+            <div class="text-green-700 font-bold">
+
+                🟢 Start:
+
+                ${startLocation.name}
+
+            </div>
+
+            <div class="text-red-700 font-bold mt-2">
+
+                🔴 Destination:
+
+                ${destinationLocation.name}
+
+            </div>
+
+            <div class="mt-3">
+
+                📏 Total Distance:
+
+                <b>${totalDistance} steps</b>
+
+            </div>
+
+            <div class="mt-3 text-blue-700">
+
+                ✓ Route Ready
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+};
 
 </script>
 
