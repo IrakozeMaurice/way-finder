@@ -9,7 +9,9 @@ class Waypoint extends Model
     protected $fillable = [
         'floor_id',
         'x',
-        'y'
+        'y',
+        'is_transition',
+        'linked_waypoint_id',
     ];
 
     public function floor()
@@ -37,4 +39,15 @@ class Waypoint extends Model
     {
         return $this->hasMany(Location::class);
     }
+
+    public function linkedWaypoint()
+{
+    return $this->belongsTo(
+
+        Waypoint::class,
+
+        'linked_waypoint_id'
+
+    );
+}
 }

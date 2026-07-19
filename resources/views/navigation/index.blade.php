@@ -172,9 +172,11 @@ document.getElementById("navigateButton").onclick = function () {
 
     .then(data => {
 
-        shortestPath = data.path;
+        shortestPath=data.path;
 
-        totalDistance = data.distance;
+        floorSequence=data.floors;
+
+        totalDistance=data.distance;
 
         redraw();
 

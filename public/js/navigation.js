@@ -2,6 +2,8 @@ const canvas = document.getElementById("navigationCanvas");
 
 const ctx = canvas.getContext("2d");
 
+let floorSequence=[];
+
 let hallways = [];
 let waypoints = [];
 let locations = [];
@@ -85,11 +87,45 @@ function drawWaypoints(){
 
         ctx.beginPath();
 
-        ctx.arc(w.x,w.y,7,0,Math.PI*2);
+        ctx.arc(
 
-        ctx.fillStyle="#16a34a";
+            w.x,
+
+            w.y,
+
+            7,
+
+            0,
+
+            Math.PI*2
+
+        );
+
+        if(w.is_transition){
+
+            ctx.fillStyle="#dc2626";
+
+        }else{
+
+            ctx.fillStyle="#16a34a";
+
+        }
 
         ctx.fill();
+
+        ctx.font="11px Arial";
+
+        ctx.fillStyle="black";
+
+        ctx.fillText(
+
+            "WP"+w.id,
+
+            w.x+10,
+
+            w.y-10
+
+        );
 
     });
 
@@ -284,6 +320,8 @@ function redraw(){
 
     drawHallways();
 
+    shortestPath = getCurrentFloorPath(FLOOR_ID);
+
     drawShortestPath();
 
     drawWaypoints();
@@ -291,5 +329,21 @@ function redraw(){
     drawLocations();
 
     drawStartAndDestination();
+
+}
+
+function getCurrentFloorPath(floor){
+
+    return shortestPath.filter(function(id){
+
+        let item=floorSequence.find(function(f){
+
+            return f.waypoint==id;
+
+        });
+
+        return item && item.floor==floor;
+
+    });
 
 }

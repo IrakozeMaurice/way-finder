@@ -27,38 +27,70 @@ class DesignerController extends Controller
 
         try {
 
-            Hallway::where('floor_id', $floor->id)->delete();
-
-            Waypoint::where('floor_id', $floor->id)->delete();
-
-            Location::where('floor_id', $floor->id)->delete();
-
-            Connection::where('floor_id', $floor->id)->delete();
-
-
             /*
-            |--------------------------------------------------------------------------
-            | Hallways
-            |--------------------------------------------------------------------------
-            */
+|--------------------------------------------------------------------------
+| Hallways
+|--------------------------------------------------------------------------
+*/
 
-            foreach ($request->hallways as $hallway) {
+$currentHallwayIds=[];
 
-                Hallway::create([
+foreach($request->hallways as $hallway){
 
-                    'floor_id' => $floor->id,
+    if(!empty($hallway['db_id'])){
 
-                    'x1' => $hallway['x1'],
+        $h=Hallway::find($hallway['db_id']);
 
-                    'y1' => $hallway['y1'],
+        if($h){
 
-                    'x2' => $hallway['x2'],
+            $h->update([
 
-                    'y2' => $hallway['y2']
+                'x1'=>$hallway['x1'],
+                'y1'=>$hallway['y1'],
+                'x2'=>$hallway['x2'],
+                'y2'=>$hallway['y2']
 
-                ]);
+            ]);
 
-            }
+        }else{
+
+            $h=Hallway::create([
+
+                'floor_id'=>$floor->id,
+
+                'x1'=>$hallway['x1'],
+                'y1'=>$hallway['y1'],
+                'x2'=>$hallway['x2'],
+                'y2'=>$hallway['y2']
+
+            ]);
+
+        }
+
+    }else{
+
+        $h=Hallway::create([
+
+            'floor_id'=>$floor->id,
+
+            'x1'=>$hallway['x1'],
+            'y1'=>$hallway['y1'],
+            'x2'=>$hallway['x2'],
+            'y2'=>$hallway['y2']
+
+        ]);
+
+    }
+
+    $currentHallwayIds[]=$h->id;
+
+}
+
+Hallway::where('floor_id',$floor->id)
+
+->whereNotIn('id',$currentHallwayIds)
+
+->delete();
 
 
             /*
@@ -69,21 +101,73 @@ class DesignerController extends Controller
 
             $waypointMap = [];
 
+            $currentWaypointIds = [];
+
             foreach ($request->waypoints as $point) {
 
-                $wp = Waypoint::create([
+                if (!empty($point['db_id'])) {
 
-                    'floor_id' => $floor->id,
+                    $wp = Waypoint::find($point['db_id']);
 
-                    'x' => $point['x'],
+                    if ($wp) {
 
-                    'y' => $point['y']
+                        $wp->update([
 
-                ]);
+                            'x' => $point['x'],
+
+                            'y' => $point['y'],
+
+                            'is_transition' => $point['is_transition'] ?? false,
+
+                            'linked_waypoint_id' => $point['linked_waypoint_id'] ?? null
+
+                        ]);
+
+                    } else {
+
+                        $wp = Waypoint::create([
+
+                            'floor_id' => $floor->id,
+
+                            'x' => $point['x'],
+
+                            'y' => $point['y'],
+
+                            'is_transition' => $point['is_transition'] ?? false,
+
+                            'linked_waypoint_id' => $point['linked_waypoint_id'] ?? null
+
+                        ]);
+
+                    }
+
+                } else {
+
+                    $wp = Waypoint::create([
+
+                        'floor_id' => $floor->id,
+
+                        'x' => $point['x'],
+
+                        'y' => $point['y'],
+
+                        'is_transition' => false,
+
+                        'linked_waypoint_id' => null
+
+                    ]);
+
+                }
+
+                $currentWaypointIds[] = $wp->id;
 
                 $waypointMap[$point['id']] = $wp->id;
 
             }
+
+            Waypoint::where('floor_id', $floor->id)
+                ->whereNotIn('id', $currentWaypointIds)
+                ->delete();
 
 
             /*
@@ -92,47 +176,77 @@ class DesignerController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            foreach ($request->locations as $location) {
+            $currentLocationIds=[];
 
-                $nearestWaypoint = null;
+            foreach($request->locations as $location){
 
-                $shortestDistance = PHP_FLOAT_MAX;
+                $nearestWaypoint=null;
 
-                foreach ($request->waypoints as $waypoint) {
+                $shortestDistance=PHP_FLOAT_MAX;
 
-                    $dx = $location['x'] - $waypoint['x'];
+                foreach($request->waypoints as $waypoint){
 
-                    $dy = $location['y'] - $waypoint['y'];
+                    $dx=$location['x']-$waypoint['x'];
 
-                    $distance = sqrt(($dx * $dx) + ($dy * $dy));
+                    $dy=$location['y']-$waypoint['y'];
 
-                    if ($distance < $shortestDistance) {
+                    $distance=sqrt($dx*$dx+$dy*$dy);
 
-                        $shortestDistance = $distance;
+                    if($distance<$shortestDistance){
 
-                        $nearestWaypoint = $waypoint;
+                        $shortestDistance=$distance;
+
+                        $nearestWaypoint=$waypoint;
 
                     }
 
                 }
 
-                Location::create([
+                $data=[
 
-                    'floor_id' => $floor->id,
+                    'name'=>$location['name'],
 
-                    'name' => $location['name'],
+                    'x'=>$location['x'],
 
-                    'x' => $location['x'],
+                    'y'=>$location['y'],
 
-                    'y' => $location['y'],
-
-                    'waypoint_id' => $nearestWaypoint
+                    'waypoint_id'=>$nearestWaypoint
                         ? $waypointMap[$nearestWaypoint['id']]
                         : null
 
-                ]);
+                ];
+
+                if(!empty($location['db_id'])){
+
+                    $loc=Location::find($location['db_id']);
+
+                    if($loc){
+
+                        $loc->update($data);
+
+                    }else{
+
+                        $data['floor_id']=$floor->id;
+
+                        $loc=Location::create($data);
+
+                    }
+
+                }else{
+
+                    $data['floor_id']=$floor->id;
+
+                    $loc=Location::create($data);
+
+                }
+
+                $currentLocationIds[]=$loc->id;
 
             }
+
+            Location::where('floor_id',$floor->id)
+            ->whereNotIn('id',$currentLocationIds)
+            ->delete();
 
 
             /*
@@ -141,23 +255,52 @@ class DesignerController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            foreach ($request->connections as $connection) {
+            $currentConnectionIds=[];
 
-                Connection::create([
+            foreach($request->connections as $connection){
 
-                    'floor_id' => $floor->id,
+                $data=[
 
-                    'from_waypoint_id' =>
-                        $waypointMap[$connection['from']],
+                    'from_waypoint_id'=>$waypointMap[$connection['from']],
 
-                    'to_waypoint_id' =>
-                        $waypointMap[$connection['to']],
+                    'to_waypoint_id'=>$waypointMap[$connection['to']],
 
-                    'distance' => $connection['distance']
+                    'distance'=>$connection['distance']
 
-                ]);
+                ];
+
+                if(!empty($connection['db_id'])){
+
+                    $c=Connection::find($connection['db_id']);
+
+                    if($c){
+
+                        $c->update($data);
+
+                    }else{
+
+                        $data['floor_id']=$floor->id;
+
+                        $c=Connection::create($data);
+
+                    }
+
+                }else{
+
+                    $data['floor_id']=$floor->id;
+
+                    $c=Connection::create($data);
+
+                }
+
+                $currentConnectionIds[]=$c->id;
 
             }
+
+            Connection::where('floor_id',$floor->id)
+            ->whereNotIn('id',$currentConnectionIds)
+            ->delete();
+
 
             DB::commit();
 
@@ -190,7 +333,7 @@ class DesignerController extends Controller
 
         $hallways = Hallway::where('floor_id',$floor->id)->get();
 
-        $waypoints = Waypoint::where('floor_id',$floor->id)->get();
+        $waypoints = Waypoint::with('floor')->where('floor_id',$floor->id)->get();
 
         $locations = Location::where('floor_id',$floor->id)->get();
 
@@ -208,6 +351,44 @@ class DesignerController extends Controller
             'connections'=>$connections
 
         ]);
+    }
+
+    public function toggleTransition(Waypoint $waypoint)
+    {
+
+        $waypoint->is_transition=
+
+        !$waypoint->is_transition;
+
+        $waypoint->save();
+
+        return response()->json(true);
+
+    }
+
+    public function transitionWaypoints()
+    {
+        return response()->json(
+
+            \App\Models\Waypoint::with('floor')
+                ->where('is_transition',true)
+                ->orderBy('floor_id')
+                ->get()
+
+        );
+    }
+
+    public function linkWaypoint(Request $request, Waypoint $waypoint)
+    {
+
+        $waypoint->linked_waypoint_id=
+
+        $request->linked_waypoint_id;
+
+        $waypoint->save();
+
+        return response()->json(true);
+
     }
 
 }

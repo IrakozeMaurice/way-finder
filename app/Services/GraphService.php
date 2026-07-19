@@ -3,48 +3,54 @@
 namespace App\Services;
 
 use App\Models\Connection;
+use App\Models\StairConnection;
 
 class GraphService
 {
-    public function build($floorId)
+    public function build()
     {
         $graph=[];
 
-        $connections=Connection::where(
+        foreach(Connection::all() as $connection){
 
-            'floor_id',
+            $graph[$connection->from_waypoint_id][]= [
 
-            $floorId
+                'node'=>$connection->to_waypoint_id,
 
-        )->get();
-
-        foreach($connections as $connection){
-
-            $from=$connection->from_waypoint_id;
-
-            $to=$connection->to_waypoint_id;
-
-            $distance=$connection->distance;
-
-            $graph[$from][]=[
-
-                'node'=>$to,
-
-                'distance'=>$distance
+                'distance'=>$connection->distance
 
             ];
 
-            $graph[$to][]=[
+            $graph[$connection->to_waypoint_id][]= [
 
-                'node'=>$from,
+                'node'=>$connection->from_waypoint_id,
 
-                'distance'=>$distance
+                'distance'=>$connection->distance
+
+            ];
+
+        }
+
+        foreach(StairConnection::all() as $connection){
+
+            $graph[$connection->from_waypoint_id][]= [
+
+                'node'=>$connection->to_waypoint_id,
+
+                'distance'=>$connection->distance
+
+            ];
+
+            $graph[$connection->to_waypoint_id][]= [
+
+                'node'=>$connection->from_waypoint_id,
+
+                'distance'=>$connection->distance
 
             ];
 
         }
 
         return $graph;
-
     }
 }

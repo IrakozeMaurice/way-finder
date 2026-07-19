@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Location;
 use App\Services\GraphService;
 use App\Services\DijkstraService;
+use App\Models\Waypoint;
 
 class NavigationController extends Controller
 {
@@ -14,9 +15,7 @@ class NavigationController extends Controller
 
         $end = Location::findOrFail($endLocation);
 
-        $graph = (new GraphService())
-
-            ->build($start->floor_id);
+        $graph = (new GraphService())->build();
 
 
         $result =
@@ -33,6 +32,24 @@ class NavigationController extends Controller
 
             );
 
+
+        $waypoints = Waypoint::whereIn('id', $result['path'])->get()->keyBy('id');
+
+        $result['floors'] = [];
+
+        foreach($result['path'] as $id){
+
+            $result['floors'][] = [
+
+                'waypoint' => $id,
+
+                'floor' =>
+
+                $waypoints[$id]->floor_id
+
+            ];
+
+        }
 
         return response()->json($result);
 

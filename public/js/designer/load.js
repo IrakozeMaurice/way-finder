@@ -7,30 +7,26 @@ function loadDesigner(){
     .then(data=>{
 
         hallways=[];
-
         locations=[];
-
         waypoints=[];
-
         connections=[];
 
-
         /*
-        ------------------------
+        -----------------------------------
         Hallways
-        ------------------------
+        -----------------------------------
         */
 
         data.hallways.forEach(function(h){
 
             hallways.push({
 
+                id:h.id,
+                db_id:h.id,
+
                 x1:h.x1,
-
                 y1:h.y1,
-
                 x2:h.x2,
-
                 y2:h.y2
 
             });
@@ -39,9 +35,9 @@ function loadDesigner(){
 
 
         /*
-        ------------------------
+        -----------------------------------
         Locations
-        ------------------------
+        -----------------------------------
         */
 
         data.locations.forEach(function(l){
@@ -49,12 +45,14 @@ function loadDesigner(){
             locations.push({
 
                 id:l.id,
+                db_id:l.id,
 
                 name:l.name,
 
                 x:l.x,
+                y:l.y,
 
-                y:l.y
+                waypoint_id:l.waypoint_id
 
             });
 
@@ -62,9 +60,9 @@ function loadDesigner(){
 
 
         /*
-        ------------------------
+        -----------------------------------
         Waypoints
-        ------------------------
+        -----------------------------------
         */
 
         data.waypoints.forEach(function(w){
@@ -72,10 +70,16 @@ function loadDesigner(){
             waypoints.push({
 
                 id:w.id,
+                db_id:w.id,
 
                 x:w.x,
+                y:w.y,
 
-                y:w.y
+                floor_id:w.floor_id,
+
+                is_transition:w.is_transition,
+
+                linked_waypoint_id:w.linked_waypoint_id
 
             });
 
@@ -83,20 +87,35 @@ function loadDesigner(){
 
 
         /*
-        ------------------------
+        -----------------------------------
         Connections
-        ------------------------
+        -----------------------------------
         */
 
         data.connections.forEach(function(c){
 
-            let from=waypoints.find(w=>w.id==c.from_waypoint_id);
+            let from=waypoints.find(function(w){
 
-            let to=waypoints.find(w=>w.id==c.to_waypoint_id);
+                return w.id==c.from_waypoint_id;
 
-            if(!from || !to) return;
+            });
+
+            let to=waypoints.find(function(w){
+
+                return w.id==c.to_waypoint_id;
+
+            });
+
+            if(!from || !to){
+
+                return;
+
+            }
 
             connections.push({
+
+                id:c.id,
+                db_id:c.id,
 
                 from:from.id,
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FloorController;
 use App\Http\Controllers\DesignerController;
 use App\Http\Controllers\NavigationController;
+use App\Http\Controllers\StairConnectionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +36,7 @@ Route::middleware('admin')->group(function () {
 
     Route::get('/admin/floors', [FloorController::class,'index']);
 
+    Route::get('/admin/designer/transitions', [DesignerController::class, 'transitionWaypoints']);
 
     Route::get('/admin/designer/{floor}', [DesignerController::class, 'index']);
 
@@ -45,5 +47,17 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/designer/{floor}/load', [DesignerController::class,'load'])
         ->name('designer.load');
 
+
+
+    Route::get('/admin/stairs', [StairConnectionController::class,'index'])->name('stairs.index');
+
+    Route::post('/admin/stairs', [StairConnectionController::class,'store'])->name('stairs.store');
+
+    Route::delete('/admin/stairs/{stair}', [StairConnectionController::class,'destroy'])->name('stairs.destroy');
+
+    Route::post('/admin/waypoint/{waypoint}/toggle', [DesignerController::class, 'toggleTransition']);
+
+
+    Route::post('/admin/waypoint/{waypoint}/link', [DesignerController::class, 'linkWaypoint']);
 
 });
