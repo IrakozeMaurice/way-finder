@@ -216,28 +216,29 @@
 </div>
 
 
-<div
+<div id="cameraContainer"
+    class="hidden fixed inset-0 bg-black z-50">
 
-id="cameraContainer"
+    <video
+        id="camera"
+        autoplay
+        playsinline
+        class="absolute inset-0 w-full h-full object-cover">
+    </video>
 
-class="hidden fixed inset-0 bg-black z-50">
+    <button
+        id="closeCamera"
+        class="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg">
 
-<video
+        Close
 
-id="camera"
-
-autoplay
-
-playsinline
-
-class="w-full h-full object-cover">
-
-</video>
+    </button>
 
 </div>
 
 
 <script src="{{ asset('js/navigation.js') }}"></script>
+<script src="{{ asset('js/camera.js') }}"></script>
 
 <script>
     const FLOOR_NAMES={
@@ -393,12 +394,15 @@ class="w-full h-full object-cover">
     };
 
 </script>
+
 <script>
     document.getElementById("cameraButton").onclick=function(){
+        openCamera();
+    };
 
-    alert("Camera module will be added next.");
-
-};
+    document.getElementById("closeCamera").onclick=function(){
+        closeCamera();
+    };
 </script>
 
 @endsection
