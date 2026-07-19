@@ -2,7 +2,11 @@ const canvas = document.getElementById("navigationCanvas");
 
 const ctx = canvas.getContext("2d");
 
-let floorSequence=[];
+let currentFloor = 1;
+
+let floorSequence = [];
+
+let floorSegments = [];
 
 let hallways = [];
 let waypoints = [];
@@ -133,7 +137,9 @@ function drawWaypoints(){
 
 function drawShortestPath(){
 
-    if(shortestPath.length<2){
+    let path = getCurrentFloorSegment();
+
+    if(path.length < 2){
 
         return;
 
@@ -149,7 +155,7 @@ function drawShortestPath(){
 
         waypoints.find(function(w){
 
-            return w.id==shortestPath[i];
+            return w.id==path[i];
 
         });
 
@@ -157,7 +163,7 @@ function drawShortestPath(){
 
         waypoints.find(function(w){
 
-            return w.id==shortestPath[i+1];
+            return w.id==path[i+1];
 
         });
 
@@ -235,7 +241,7 @@ function drawArrow(from,to){
 
 function drawStartAndDestination(){
 
-    if(startLocation){
+    if(startLocation && startLocation.floor_id == currentFloor){
 
         ctx.beginPath();
 
@@ -274,7 +280,7 @@ function drawStartAndDestination(){
     }
 
 
-    if(destinationLocation){
+    if(destinationLocation && destinationLocation.floor_id == currentFloor){
 
         ctx.beginPath();
 
@@ -320,8 +326,6 @@ function redraw(){
 
     drawHallways();
 
-    shortestPath = getCurrentFloorPath(FLOOR_ID);
-
     drawShortestPath();
 
     drawWaypoints();
@@ -332,18 +336,20 @@ function redraw(){
 
 }
 
-function getCurrentFloorPath(floor){
+function getCurrentFloorSegment(){
 
-    return shortestPath.filter(function(id){
+    let segment = floorSegments.find(function(segment){
 
-        let item=floorSequence.find(function(f){
-
-            return f.waypoint==id;
-
-        });
-
-        return item && item.floor==floor;
+        return segment.floor == currentFloor;
 
     });
+
+    if(segment){
+
+        return segment.path;
+
+    }
+
+    return [];
 
 }

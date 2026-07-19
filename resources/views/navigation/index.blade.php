@@ -154,17 +154,24 @@ document.getElementById("navigateButton").onclick = function () {
 
     let destination = parseInt(document.getElementById("destination").value);
 
+    startLocation = null;
+
+    destinationLocation = null;
+
+    // Start location is always on the currently displayed floor
     startLocation = locations.find(function(location){
 
-        return location.id == start;
+        return Number(location.id) === Number(start);
 
     });
 
+    // Destination is only visible if it is on the current floor
     destinationLocation = locations.find(function(location){
 
-        return location.id == destination;
+        return Number(location.id) === Number(destination);
 
     });
+
 
     fetch("/navigation/" + start + "/" + destination)
 
@@ -172,11 +179,15 @@ document.getElementById("navigateButton").onclick = function () {
 
     .then(data => {
 
-        shortestPath=data.path;
+        shortestPath = data.path;
 
-        floorSequence=data.floors;
+        floorSequence = data.floors;
 
-        totalDistance=data.distance;
+        floorSegments = data.segments;
+
+        currentFloor = floorSegments[0].floor;
+
+        totalDistance = data.distance;
 
         redraw();
 
@@ -188,7 +199,7 @@ document.getElementById("navigateButton").onclick = function () {
 
                 🟢 Start:
 
-                ${startLocation.name}
+                ${data.start_name}
 
             </div>
 
@@ -196,7 +207,7 @@ document.getElementById("navigateButton").onclick = function () {
 
                 🔴 Destination:
 
-                ${destinationLocation.name}
+                ${data.destination_name}
 
             </div>
 

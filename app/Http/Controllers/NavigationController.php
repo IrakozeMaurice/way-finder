@@ -51,6 +51,63 @@ class NavigationController extends Controller
 
         }
 
+        /*
+|--------------------------------------------------------------------------
+| Split path into floor segments
+|--------------------------------------------------------------------------
+*/
+
+$result['segments'] = [];
+
+$currentFloor = null;
+
+$currentSegment = [];
+
+foreach($result['path'] as $waypointId){
+
+    $floor = $waypoints[$waypointId]->floor_id;
+
+    if($currentFloor === null){
+
+        $currentFloor = $floor;
+
+    }
+
+    if($floor != $currentFloor){
+
+        $result['segments'][] = [
+
+            'floor'=>$currentFloor,
+
+            'path'=>$currentSegment
+
+        ];
+
+        $currentFloor = $floor;
+
+        $currentSegment = [];
+
+    }
+
+    $currentSegment[] = $waypointId;
+
+}
+
+if(count($currentSegment)>0){
+
+    $result['segments'][] = [
+
+        'floor'=>$currentFloor,
+
+        'path'=>$currentSegment
+
+    ];
+
+}
+
+        $result['start_name'] = $start->name;
+        $result['destination_name'] = $end->name;
+
         return response()->json($result);
 
     }
