@@ -2,121 +2,255 @@
 
 @section('content')
 
-<div class="container mx-auto px-6 py-6">
+<div class="min-h-screen bg-gray-100">
 
-<h1 class="text-3xl font-bold mb-6">
+<div class="max-w-md mx-auto bg-white shadow-lg">
 
-Indoor Navigation
+    <!-- Header -->
 
-</h1>
+    <div class="bg-blue-600 text-white p-4">
 
+        <h1 class="text-xl font-bold">
 
-<div class="grid grid-cols-12 gap-6">
+            Indoor Navigation
 
-<div class="col-span-3">
+        </h1>
 
-<div class="bg-white shadow rounded p-5">
+        <p class="text-sm opacity-80">
 
-<label class="font-bold">
+            University of Kigali
 
-Start
+        </p>
 
-</label>
-
-<select
-id="start"
-class="w-full border rounded p-2 mt-2">
-
-@foreach($locations as $location)
-
-<option value="{{ $location->id }}">
-
-{{ $location->name }}
-
-</option>
-
-@endforeach
-
-</select>
+    </div>
 
 
-<label
-class="font-bold block mt-5">
+    <!-- Controls -->
 
-Destination
+    <div class="p-4 space-y-4">
 
-</label>
+        <div>
 
-<select
-id="destination"
-class="w-full border rounded p-2 mt-2">
+            <label class="font-semibold">
 
-@foreach($locations as $location)
+                Start
 
-<option value="{{ $location->id }}">
+            </label>
 
-{{ $location->name }}
+            <select
 
-</option>
+                id="start"
 
-@endforeach
+                class="w-full border rounded-lg p-3 mt-2">
 
-</select>
+                @foreach($locations as $location)
+
+                    <option value="{{ $location->id }}">
+
+                        {{ $location->name }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </div>
 
 
-<button
-id="navigateButton"
-class="w-full bg-blue-600 text-white p-2 rounded mt-5">
+        <div>
 
-Navigate
+            <label class="font-semibold">
 
-</button>
+                Destination
+
+            </label>
+
+            <select
+
+                id="destination"
+
+                class="w-full border rounded-lg p-3 mt-2">
+
+                @foreach($locations as $location)
+
+                    <option value="{{ $location->id }}">
+
+                        {{ $location->name }}
+
+                    </option>
+
+                @endforeach
+
+            </select>
+
+        </div>
+
+
+        <button
+
+            id="navigateButton"
+
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-lg py-4">
+
+            START NAVIGATION
+
+        </button>
+
+    </div>
+
+
+    <!-- Status Card -->
+
+    <div id="navigationStatus"
+
+        class="mx-4 mb-4 rounded-xl bg-blue-50 border border-blue-300 shadow p-4">
+
+        <div class="text-lg font-bold">
+
+            Ready
+
+        </div>
+
+        <div class="text-gray-500 mt-2">
+
+            Select start and destination.
+
+        </div>
+
+    </div>
+
+
+    <!-- Floor Card -->
+
+    <div
+
+        class="mx-4 mb-4 rounded-lg border bg-white shadow p-4">
+
+        <div class="text-sm text-gray-500">
+
+            Current Floor
+
+        </div>
+
+        <div
+
+            id="currentFloor"
+
+            class="text-2xl font-bold mt-2">
+
+            Ground Floor
+
+        </div>
+
+    </div>
+
+
+    <!-- Distance Card -->
+
+    <div
+
+        class="mx-4 mb-4 rounded-lg border bg-white shadow p-4">
+
+        <div class="text-sm text-gray-500">
+
+            Remaining Distance
+
+        </div>
+
+        <div
+
+            id="distanceLabel"
+
+            class="text-2xl font-bold mt-2">
+
+            --
+
+        </div>
+
+    </div>
+
+    <div class="mx-4 mb-4 rounded-lg border bg-white shadow p-4">
+
+        <div class="text-sm text-gray-500">
+
+        Navigation
+
+        </div>
+
+        <div id="routeProgress"
+
+        class="text-lg font-semibold mt-2">
+
+        Waiting...
+
+        </div>
+
+    </div>
+
+
+    <!-- Canvas -->
+
+    <div class="mx-2 mb-4">
+
+        <canvas id="navigationCanvas" class="w-full rounded-lg border shadow">
+
+        </canvas>
+
+    </div>
+
+    <div class="fixed bottom-6 right-6">
+
+        <button id="cameraButton"
+
+            class="w-16 h-16 rounded-full bg-green-600 text-white shadow-xl text-3xl">
+
+                📷
+
+        </button>
+
+    </div>
 
 </div>
 
 </div>
 
-
-<div class="col-span-9">
-
-<div class="bg-white rounded shadow p-3">
-
-<canvas
-
-id="navigationCanvas"
-
-width="1200"
-
-height="700">
-
-</canvas>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
 
 <div
-id="navigationStatus"
-class="mt-4 bg-blue-50 border border-blue-200 rounded p-4">
 
-<b>Navigation Ready</b>
+id="cameraContainer"
 
-<p class="text-gray-600 mt-2">
+class="hidden fixed inset-0 bg-black z-50">
 
-Select a start location and destination,
-then click <b>Navigate</b>.
+<video
 
-</p>
+id="camera"
+
+autoplay
+
+playsinline
+
+class="w-full h-full object-cover">
+
+</video>
 
 </div>
+
 
 <script src="{{ asset('js/navigation.js') }}"></script>
 
 <script>
+    const FLOOR_NAMES={
+
+        1:"Ground Floor",
+
+        2:"First Floor",
+
+        3:"Second Floor",
+
+        4:"Third Floor"
+
+    };
 
     loadFloor(1);
 
@@ -138,6 +272,8 @@ then click <b>Navigate</b>.
 
             redraw();
 
+            document.getElementById("currentFloor").innerHTML = FLOOR_NAMES[floor];
+
         });
 
     }
@@ -146,98 +282,123 @@ then click <b>Navigate</b>.
 
 <script>
 
-document.getElementById("navigateButton").onclick = function () {
+    document.getElementById("navigateButton").onclick = function () {
 
-    let start = parseInt(document.getElementById("start").value);
+        let start = parseInt(document.getElementById("start").value);
 
-    let destination = parseInt(document.getElementById("destination").value);
+        let destination = parseInt(document.getElementById("destination").value);
 
-    startLocation = null;
+        startLocation = null;
 
-    destinationLocation = null;
+        destinationLocation = null;
 
-    // Start location is always on the currently displayed floor
-    startLocation = locations.find(function(location){
+        // Start location is always on the currently displayed floor
+        startLocation = locations.find(function(location){
 
-        return Number(location.id) === Number(start);
+            return Number(location.id) === Number(start);
 
-    });
+        });
 
-    // Destination is only visible if it is on the current floor
-    destinationLocation = locations.find(function(location){
+        // Destination is only visible if it is on the current floor
+        destinationLocation = locations.find(function(location){
 
-        return Number(location.id) === Number(destination);
+            return Number(location.id) === Number(destination);
 
-    });
-
-
-    fetch("/navigation/" + start + "/" + destination)
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        shortestPath = data.path;
-
-        floorSequence = data.floors;
-
-        floorSegments = data.segments;
-
-        currentSegmentIndex = 0;
-
-        showCurrentSegment();
-
-        return;
+        });
 
 
-        currentFloor = floorSegments[0].floor;
+        fetch("/navigation/" + start + "/" + destination)
 
-        totalDistance = data.distance;
+        .then(response => response.json())
 
-        // redraw();
+        .then(data => {
 
-        document.getElementById("navigationStatus").innerHTML = `
+            shortestPath = data.path;
 
-        <div class="bg-blue-50 border rounded p-4">
+            floorSequence = data.floors;
 
-            <div class="text-green-700 font-bold">
+            floorSegments = data.segments;
 
-                🟢 Start:
+            currentSegmentIndex = 0;
 
-                ${data.start_name}
+            showCurrentSegment();
 
-            </div>
+            return;
 
-            <div class="text-red-700 font-bold mt-2">
 
-                🔴 Destination:
+            currentFloor = floorSegments[0].floor;
 
-                ${data.destination_name}
+            totalDistance = data.distance;
 
-            </div>
+            document.getElementById("routeProgress").innerHTML="Following shortest path...";
 
-            <div class="mt-3">
+            document.getElementById("distanceLabel").innerHTML=data.distance+" steps";
 
-                📏 Total Distance:
+            if(data.floors.length){
 
-                <b>${totalDistance} steps</b>
+                let floor=data.floors[0].floor;
 
-            </div>
+                document.getElementById("currentFloor").innerHTML=
 
-            <div class="mt-3 text-blue-700">
+                FLOOR_NAMES[floor];
 
-                ✓ Route Ready
+            }
 
-            </div>
+            // redraw();
 
-        </div>
+            document.getElementById("navigationStatus").innerHTML = `
+                <div class="space-y-2">
 
-        `;
+                <div>
 
-    });
+                <b>Start</b>
+
+                <br>
+
+                ${startLocation.name}
+
+                </div>
+
+                <div>
+
+                <b>Destination</b>
+
+                <br>
+
+                ${destinationLocation.name}
+
+                </div>
+
+                <div>
+
+                <b>Total Distance</b>
+
+                <br>
+
+                ${totalDistance} steps
+
+                </div>
+
+                <div class="text-green-700 font-bold">
+
+                Navigation Active
+
+                </div>
+
+                </div>`
+            ;
+
+        });
+
+    };
+
+</script>
+<script>
+    document.getElementById("cameraButton").onclick=function(){
+
+    alert("Camera module will be added next.");
 
 };
-
 </script>
 
 @endsection

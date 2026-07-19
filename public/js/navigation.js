@@ -2,6 +2,18 @@ const canvas = document.getElementById("navigationCanvas");
 
 const ctx = canvas.getContext("2d");
 
+resizeCanvas();
+
+window.addEventListener("resize",resizeCanvas);
+
+function resizeCanvas(){
+
+    canvas.width=canvas.parentElement.clientWidth;
+
+    canvas.height=window.innerHeight*0.60;
+
+}
+
 let currentFloor = 1;
 let currentSegmentIndex = 0;
 
@@ -150,7 +162,7 @@ function drawShortestPath(){
 
     ctx.lineWidth=5;
 
-    for(let i=0;i<shortestPath.length-1;i++){
+    for(let i=0;i<path.length-1;i++){
 
         let from=
 
@@ -224,7 +236,7 @@ function drawArrow(from,to){
 
     const midY=(from.y+to.y)/2;
 
-    const size=12;
+    const size=18;
 
     ctx.save();
 
@@ -262,7 +274,7 @@ function drawStartAndDestination(){
 
             startLocation.y+20,
 
-            12,
+            18,
 
             0,
 
@@ -276,7 +288,7 @@ function drawStartAndDestination(){
 
         ctx.fillStyle="white";
 
-        ctx.font="bold 12px Arial";
+        ctx.font="bold 18px Arial";
 
         ctx.fillText(
 
@@ -301,7 +313,7 @@ function drawStartAndDestination(){
 
             destinationLocation.y+20,
 
-            12,
+            18,
 
             0,
 
@@ -315,7 +327,7 @@ function drawStartAndDestination(){
 
         ctx.fillStyle="white";
 
-        ctx.font="bold 12px Arial";
+        ctx.font="bold 18px Arial";
 
         ctx.fillText(
 
@@ -384,5 +396,17 @@ function nextFloor(){
     currentSegmentIndex++;
 
     showCurrentSegment();
+
+}
+
+function routeCompleted(){
+
+    document
+
+    .getElementById("routeProgress")
+
+    .innerHTML=
+
+    "Destination reached.";
 
 }
