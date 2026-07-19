@@ -204,7 +204,7 @@ function drawShortestPath(){
 
             nextFloor();
 
-        },2000);
+        },8000);
 
     }
 
