@@ -118,29 +118,27 @@ then click <b>Navigate</b>.
 
 <script>
 
-    const FLOOR_ID=1;
+    loadFloor(1);
 
-    loadFloor();
+    function loadFloor(floor){
 
-    function loadFloor(){
+        fetch("/navigation/floor/"+floor)
 
-    fetch("/navigation/floor/"+FLOOR_ID)
+        .then(response=>response.json())
 
-    .then(response=>response.json())
+        .then(data=>{
 
-    .then(data=>{
+            hallways=data.hallways;
 
-    hallways=data.hallways;
+            waypoints=data.waypoints;
 
-    waypoints=data.waypoints;
+            locations=data.locations;
 
-    locations=data.locations;
+            connections=data.connections;
 
-    connections=data.connections;
+            redraw();
 
-    redraw();
-
-    });
+        });
 
     }
 
@@ -185,11 +183,18 @@ document.getElementById("navigateButton").onclick = function () {
 
         floorSegments = data.segments;
 
+        currentSegmentIndex = 0;
+
+        showCurrentSegment();
+
+        return;
+
+
         currentFloor = floorSegments[0].floor;
 
         totalDistance = data.distance;
 
-        redraw();
+        // redraw();
 
         document.getElementById("navigationStatus").innerHTML = `
 

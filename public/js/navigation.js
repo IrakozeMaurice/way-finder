@@ -3,6 +3,7 @@ const canvas = document.getElementById("navigationCanvas");
 const ctx = canvas.getContext("2d");
 
 let currentFloor = 1;
+let currentSegmentIndex = 0;
 
 let floorSequence = [];
 
@@ -197,6 +198,16 @@ function drawShortestPath(){
 
     }
 
+    if(currentSegmentIndex < floorSegments.length-1){
+
+        setTimeout(function(){
+
+            nextFloor();
+
+        },2000);
+
+    }
+
 }
 
 function drawArrow(from,to){
@@ -351,5 +362,27 @@ function getCurrentFloorSegment(){
     }
 
     return [];
+
+}
+
+function showCurrentSegment(){
+
+    currentFloor = floorSegments[currentSegmentIndex].floor;
+
+    loadFloor(currentFloor);
+
+}
+
+function nextFloor(){
+
+    if(currentSegmentIndex >= floorSegments.length-1){
+
+        return;
+
+    }
+
+    currentSegmentIndex++;
+
+    showCurrentSegment();
 
 }
