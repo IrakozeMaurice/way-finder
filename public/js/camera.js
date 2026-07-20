@@ -1,3 +1,5 @@
+let qrReader = null;
+let qrScanner = null;
 let cameraStream = null;
 
 async function openCamera(){
@@ -83,3 +85,142 @@ setInterval(function(){
     },400);
 
 },800);
+
+function startQrScanner(){
+
+    if(qrScanner){
+
+        qrScanner.clear();
+
+    }
+
+    qrScanner = new Html5Qrcode("qr-reader");
+
+    qrScanner.start(
+
+        {
+            facingMode:"environment"
+        },
+
+        {
+            fps:10,
+            qrbox:250
+        },
+
+        function(decodedText){
+
+            let floor=parseInt(decodedText);
+
+            if(isNaN(floor)){
+
+                return;
+
+            }
+
+            if(floor!=floorSegments[currentSegmentIndex+1].floor){
+
+                alert("Wrong floor QR.");
+
+                return;
+
+            }
+
+            qrScanner.stop();
+
+            document
+
+                .getElementById("transitionOverlay")
+
+                .classList.add("hidden");
+
+            nextFloor();
+
+        },
+
+        function(error){
+
+        }
+
+    );
+
+}
+
+function startQrScanner(expectedFloor){
+
+    if(qrReader){
+
+        qrReader.clear();
+
+    }
+
+    qrReader = new Html5Qrcode("qr-reader");
+
+    qrReader.start(
+
+        {
+
+            facingMode:"environment"
+
+        },
+
+        {
+
+            fps:10,
+
+            qrbox:220
+
+        },
+
+        function(decodedText){
+
+            if(!decodedText.startsWith("FLOOR:")){
+
+                return;
+
+            }
+
+            let scannedFloor=
+
+            parseInt(
+
+                decodedText.replace("FLOOR:","")
+
+            );
+
+            if(scannedFloor!=expectedFloor){
+
+                alert(
+
+                    "Wrong QR Code.\n\nExpected Floor "
+
+                    +expectedFloor
+
+                );
+
+                return;
+
+            }
+
+            qrReader.stop();
+
+            qrReader.clear();
+
+            qrReader=null;
+
+            document
+
+            .getElementById("transitionOverlay")
+
+            .classList.add("hidden");
+
+            nextFloor();
+
+        },
+
+        function(error){
+
+        }
+
+    );
+
+}

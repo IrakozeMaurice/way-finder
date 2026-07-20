@@ -4,8 +4,8 @@
 
 <div class="min-h-screen bg-gray-100">
 
-<!-- <div class="max-w-md mx-auto bg-white shadow-lg"> -->
-<div class="max-w-mdd mx-auto bg-red-200d shadow-lg">
+<div class="max-w-md mx-auto bg-white shadow-lg">
+<!-- <div class="max-w-mdd mx-auto bg-red-200d shadow-lg"> -->
 
     <!-- Header -->
 
@@ -118,21 +118,10 @@
 
             </h2>
 
-            <p
-            id="transitionMessage"
-            class="mb-6">
+            <p id="transitionMessage" class="mb-6"></p>
 
-            </p>
+            <div id="qr-reader" class="w-full mt-4"></div>
 
-            <button
-
-            id="scanQrButton"
-
-            class="bg-blue-600 text-white px-6 py-2 rounded">
-
-            Scan QR Code
-
-            </button>
 
             </div>
 
@@ -307,7 +296,7 @@ class="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-5">
 
 </div>
 
-
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script src="{{ asset('js/navigation.js') }}"></script>
 <script src="{{ asset('js/camera.js') }}"></script>
 
@@ -481,18 +470,6 @@ class="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-5">
         closeCamera();
     };
 
-</script>
-
-<script>
-    document.getElementById("scanQrButton").onclick=function(){
-
-        document.getElementById("transitionOverlay").classList.add("hidden");
-
-        nextFloor();
-
-        redraw();
-
-    };
 </script>
 
 @endsection

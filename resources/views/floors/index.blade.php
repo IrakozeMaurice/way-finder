@@ -10,35 +10,43 @@ Floors
 
 <div class="grid grid-cols-2 gap-6">
 
-@foreach($floors as $floor)
+    @foreach($floors as $floor)
 
-<div class="bg-white rounded shadow p-6">
+        <div class="bg-white rounded shadow p-6">
 
-<h2 class="text-xl font-bold">
+        <h2 class="text-xl font-bold">
 
-{{ $floor->name }}
+        {{ $floor->name }}
 
-</h2>
+        </h2>
 
-<p class="text-gray-500 mt-2">
+        <p class="text-gray-500 mt-2">
 
-Design hallways, locations and navigation graph.
+        Design hallways, locations and navigation graph.
 
-</p>
+        </p>
 
-<a
+        <div class="mt-5 flex gap-3">
 
-href="/admin/designer/{{ $floor->id }}"
+            <a href="/admin/designer/{{ $floor->id }}"
+                class="bg-blue-600 text-white px-5 py-2 rounded">
 
-class="inline-block mt-5 bg-blue-600 text-white px-5 py-2 rounded">
+            Open Designer
 
-Open Designer
+            </a>
 
-</a>
+            <a href="{{ route('floors.qr',$floor) }}"
+                class="bg-green-600 text-white px-5 py-2 rounded">
 
-</div>
+            Print QR
 
-@endforeach
+            </a>
+
+        </div>
+
+        </div>
+
+    @endforeach
 
 </div>
 

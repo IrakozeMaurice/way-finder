@@ -12,4 +12,9 @@ class FloorController extends Controller
 
         return view('floors.index',compact('floors'));
     }
+
+    public function qr(Floor $floor)
+    {
+        return view('floors.qr', compact('floor'));
+    }
 }

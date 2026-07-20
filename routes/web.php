@@ -60,4 +60,7 @@ Route::middleware('admin')->group(function () {
 
     Route::post('/admin/waypoint/{waypoint}/link', [DesignerController::class, 'linkWaypoint']);
 
+    // qr code
+    Route::get('/admin/floors/{floor}/qr', [FloorController::class,'qr'])->name('floors.qr');
+
 });

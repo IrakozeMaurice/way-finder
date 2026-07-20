@@ -14,6 +14,7 @@ function resizeCanvas(){
 
 }
 
+
 let currentFloor = 1;
 let currentSegmentIndex = 0;
 
@@ -113,7 +114,7 @@ function currentTransition(){
 
     return instructions.find(function(item){
 
-        return item.floor==currentFloor;
+        return item.from==currentWaypoint;
 
     });
 
@@ -404,9 +405,9 @@ function loadCurrentSegment(){
 
 function nextFloor(){
 
-    waitingForQr = false;
+    waitingForQr=false;
 
-    if(currentSegmentIndex >= floorSegments.length-1){
+    if(currentSegmentIndex>=floorSegments.length-1){
 
         routeCompleted();
 
@@ -422,43 +423,61 @@ function nextFloor(){
 
 function reachedTransition(){
 
-    waitingForQr = true;
+    waitingForQr=true;
+
+    let next=
+
+    floorSegments[currentSegmentIndex+1];
+
+    let direction=
+
+    next.floor>currentFloor
+
+    ?"up"
+
+    :"down";
 
     document
-        .getElementById("transitionOverlay")
-        .classList.remove("hidden");
 
-    let nextFloorName="";
+    .getElementById("transitionOverlay")
 
-    if(currentSegmentIndex+1 < floorSegments.length){
-
-        nextFloorName = floorSegments[currentSegmentIndex+1].floor;
-
-    }
+    .classList.remove("hidden");
 
     document
-        .getElementById("transitionMessage")
-        .innerHTML=
 
-        `
-        <div class="text-xl font-bold mb-3">
+    .getElementById("transitionMessage")
 
-        Floor Transition
+    .innerHTML=
 
-        </div>
+    `
+    <div class="text-3xl font-bold">
 
-        <div>
+    Floor Transition
 
-        Go upstairs.
+    </div>
 
-        </div>
+    <div class="mt-6">
 
-        <div class="mt-2">
+    Please go
 
-        Scan the QR code on Floor ${nextFloorName}.
+    <b>${direction}</b>
 
-        </div>
-        `;
+    to Floor
+
+    <b>${next.floor}</b>
+
+    </div>
+
+    <div class="mt-3">
+
+    Scan the QR code
+
+    when you arrive.
+
+    </div>
+    `;
+
+    startQrScanner(next.floor);
 
 }
 
@@ -513,6 +532,22 @@ function moveToNextWaypoint(){
     currentWaypointIndex++;
 
     updateNavigationProgress();
+
+    let transition=
+
+    currentTransition();
+
+    if(
+
+    transition &&
+
+    transition.from==currentWaypoint
+
+    ){
+
+        reachedTransition();
+
+    }
 
 }
 
