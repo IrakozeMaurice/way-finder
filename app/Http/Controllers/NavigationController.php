@@ -9,107 +9,98 @@ use App\Models\Waypoint;
 
 class NavigationController extends Controller
 {
-    public function path($startLocation, $endLocation)
+    
+    public function path($startLocation,$endLocation)
     {
-        $start = Location::findOrFail($startLocation);
+        $start=Location::findOrFail($startLocation);
 
-        $end = Location::findOrFail($endLocation);
+        $end=Location::findOrFail($endLocation);
 
-        $graph = (new GraphService())->build();
+        $graph=(new GraphService())->build();
 
+        $result=(new DijkstraService())->shortestPath(
 
-        $result =
+            $graph,
 
-            (new DijkstraService())
+            $start->waypoint_id,
 
-            ->shortestPath(
+            $end->waypoint_id
 
-                $graph,
+        );
 
-                $start->waypoint_id,
+        $waypoints=Waypoint::whereIn(
+            'id',
+            $result['path']
+        )->get()->keyBy('id');
 
-                $end->waypoint_id
+        /*
+        -----------------------------------
+        Floor segments
+        -----------------------------------
+        */
 
-            );
+        $segments=[];
 
+        $currentFloor=null;
 
-        $waypoints = Waypoint::whereIn('id', $result['path'])->get()->keyBy('id');
+        foreach($result['path'] as $waypointId){
 
-        $result['floors'] = [];
+            $floor=$waypoints[$waypointId]->floor_id;
 
-        foreach($result['path'] as $id){
+            if(!isset($segments[$floor])){
 
-            $result['floors'][] = [
+                $segments[$floor]=[
+                    'floor'=>$floor,
+                    'path'=>[]
+                ];
 
-                'waypoint' => $id,
+            }
 
-                'floor' =>
-
-                $waypoints[$id]->floor_id
-
-            ];
+            $segments[$floor]['path'][]=$waypointId;
 
         }
 
         /*
-|--------------------------------------------------------------------------
-| Split path into floor segments
-|--------------------------------------------------------------------------
-*/
+        -----------------------------------
+        Instructions
+        -----------------------------------
+        */
 
-$result['segments'] = [];
+        $instructions=[];
 
-$currentFloor = null;
+        foreach($result['path'] as $waypointId){
 
-$currentSegment = [];
+            $wp=$waypoints[$waypointId];
 
-foreach($result['path'] as $waypointId){
+            if($wp->is_transition){
 
-    $floor = $waypoints[$waypointId]->floor_id;
+                $instructions[]=[
 
-    if($currentFloor === null){
+                    'type'=>'transition',
 
-        $currentFloor = $floor;
+                    'waypoint'=>$wp->id,
 
-    }
+                    'floor'=>$wp->floor_id,
 
-    if($floor != $currentFloor){
+                    'message'=>'Go upstairs and scan the QR code.'
 
-        $result['segments'][] = [
+                ];
 
-            'floor'=>$currentFloor,
+            }
 
-            'path'=>$currentSegment
+        }
 
-        ];
+        return response()->json([
 
-        $currentFloor = $floor;
+            'path'=>$result['path'],
 
-        $currentSegment = [];
+            'distance'=>$result['distance'],
 
-    }
+            'segments'=>array_values($segments),
 
-    $currentSegment[] = $waypointId;
+            'instructions'=>$instructions
 
-}
-
-if(count($currentSegment)>0){
-
-    $result['segments'][] = [
-
-        'floor'=>$currentFloor,
-
-        'path'=>$currentSegment
-
-    ];
-
-}
-
-        $result['start_name'] = $start->name;
-        $result['destination_name'] = $end->name;
-
-        return response()->json($result);
-
+        ]);
     }
 
 

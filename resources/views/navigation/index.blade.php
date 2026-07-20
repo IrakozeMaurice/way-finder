@@ -4,7 +4,8 @@
 
 <div class="min-h-screen bg-gray-100">
 
-<div class="max-w-md mx-auto bg-white shadow-lg">
+<!-- <div class="max-w-md mx-auto bg-white shadow-lg"> -->
+<div class="max-w-mdd mx-auto bg-red-200d shadow-lg">
 
     <!-- Header -->
 
@@ -105,6 +106,37 @@
     <div id="navigationStatus"
 
         class="mx-4 mb-4 rounded-xl bg-blue-50 border border-blue-300 shadow p-4">
+
+        <div id="transitionOverlay"
+            class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+
+            <div class="bg-white rounded-lg shadow-xl p-8 w-96 text-center">
+
+            <h2 class="text-2xl font-bold mb-4">
+
+            Floor Transition
+
+            </h2>
+
+            <p
+            id="transitionMessage"
+            class="mb-6">
+
+            </p>
+
+            <button
+
+            id="scanQrButton"
+
+            class="bg-blue-600 text-white px-6 py-2 rounded">
+
+            Scan QR Code
+
+            </button>
+
+            </div>
+
+            </div>
 
         <div class="text-lg font-bold">
 
@@ -216,15 +248,54 @@
 </div>
 
 
-<div id="cameraContainer"
-    class="hidden fixed inset-0 bg-black z-50">
+<div id="cameraContainer" class="hidden fixed inset-0 bg-black z-50">
 
-    <video
-        id="camera"
-        autoplay
-        playsinline
+    <video id="camera" autoplay playsinline
         class="absolute inset-0 w-full h-full object-cover">
+        <div
+
+id="arOverlay"
+
+class="absolute inset-0 pointer-events-none">
+
+    <div
+
+    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+
+        <div
+
+        id="arArrow" class="text-red-500 drop-shadow-2xl" style="font-size:180px;">
+
+            ↑
+
+        </div>
+
+    </div>
+
+</div>
     </video>
+
+    <div
+
+class="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-5">
+
+    <div
+    id="arFloor"
+    class="text-xl font-bold">
+
+        Ground Floor
+
+    </div>
+
+    <div
+    id="arDistance"
+    class="mt-2">
+
+        --
+
+    </div>
+
+</div>
 
     <button
         id="closeCamera"
@@ -315,14 +386,20 @@
         .then(data => {
 
             shortestPath = data.path;
+            currentWaypointIndex=0;
+
+            updateNavigationProgress();
 
             floorSequence = data.floors;
 
             floorSegments = data.segments;
+            instructions=data.instructions;
 
             currentSegmentIndex = 0;
 
-            showCurrentSegment();
+            currentSegmentIndex = 0;
+
+            loadCurrentSegment();
 
             return;
 
@@ -402,6 +479,19 @@
 
     document.getElementById("closeCamera").onclick=function(){
         closeCamera();
+    };
+
+</script>
+
+<script>
+    document.getElementById("scanQrButton").onclick=function(){
+
+        document.getElementById("transitionOverlay").classList.add("hidden");
+
+        nextFloor();
+
+        redraw();
+
     };
 </script>
 

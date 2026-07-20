@@ -10,16 +10,20 @@ function resizeCanvas(){
 
     canvas.width=canvas.parentElement.clientWidth;
 
-    canvas.height=window.innerHeight*0.60;
+    canvas.height=window.innerHeight*2;
 
 }
 
 let currentFloor = 1;
 let currentSegmentIndex = 0;
 
+let instructions=[];
+let waitingForQr = false;
+
 let floorSequence = [];
 
 let floorSegments = [];
+let currentFloorPath = [];
 
 let hallways = [];
 let waypoints = [];
@@ -27,11 +31,18 @@ let locations = [];
 let connections = [];
 let shortestPath = [];
 
+let currentWaypointIndex = 0;
+
+let currentWaypoint = null;
+
+let nextWaypoint = null;
+
 let startLocation = null;
 
 let destinationLocation = null;
 
 let totalDistance = 0;
+let arrowPulse=0;
 
 const GRID = 20;
 
@@ -98,6 +109,16 @@ function drawLocations(){
 
 }
 
+function currentTransition(){
+
+    return instructions.find(function(item){
+
+        return item.floor==currentFloor;
+
+    });
+
+}
+
 function drawWaypoints(){
 
     waypoints.forEach(function(w){
@@ -128,6 +149,12 @@ function drawWaypoints(){
 
         }
 
+        if(w.id==nextWaypoint){
+
+            ctx.fillStyle="#facc15";
+
+        }
+
         ctx.fill();
 
         ctx.font="11px Arial";
@@ -150,33 +177,23 @@ function drawWaypoints(){
 
 function drawShortestPath(){
 
-    let path = getCurrentFloorSegment();
-
-    if(path.length < 2){
+    if(currentFloorPath.length < 2){
 
         return;
 
     }
 
-    ctx.strokeStyle="#adef44";
+    for(let i=0;i<currentFloorPath.length-1;i++){
 
-    ctx.lineWidth=5;
+        let from = waypoints.find(function(w){
 
-    for(let i=0;i<path.length-1;i++){
-
-        let from=
-
-        waypoints.find(function(w){
-
-            return w.id==path[i];
+            return w.id==currentFloorPath[i];
 
         });
 
-        let to=
+        let to = waypoints.find(function(w){
 
-        waypoints.find(function(w){
-
-            return w.id==path[i+1];
+            return w.id==currentFloorPath[i+1];
 
         });
 
@@ -186,37 +203,27 @@ function drawShortestPath(){
 
         }
 
+        ctx.strokeStyle="#22c55e";
+        ctx.lineWidth=8;
+
         ctx.beginPath();
-
-        ctx.moveTo(
-
-            from.x,
-
-            from.y
-
-        );
-
-        ctx.lineTo(
-
-            to.x,
-
-            to.y
-
-        );
-
+        ctx.moveTo(from.x,from.y);
+        ctx.lineTo(to.x,to.y);
         ctx.stroke();
-
-        drawArrow(from,to);
 
     }
 
-    if(currentSegmentIndex < floorSegments.length-1){
+    if(currentWaypoint && nextWaypoint){
 
-        setTimeout(function(){
+        let from=waypoints.find(w=>w.id==currentWaypoint);
 
-            nextFloor();
+        let to=waypoints.find(w=>w.id==nextWaypoint);
 
-        },8000);
+        if(from && to){
+
+            drawArrow(from,to);
+
+        }
 
     }
 
@@ -232,11 +239,13 @@ function drawArrow(from,to){
 
     );
 
-    const midX=(from.x+to.x)/2;
+    const percent=0.70;
 
-    const midY=(from.y+to.y)/2;
+    const midX=from.x+(to.x-from.x)*percent;
 
-    const size=18;
+    const midY=from.y+(to.y-from.y)*percent;
+
+    const size=18+Math.sin(arrowPulse)*3;
 
     ctx.save();
 
@@ -321,7 +330,7 @@ function drawStartAndDestination(){
 
         );
 
-        ctx.fillStyle="red";
+        ctx.fillStyle=(nextWaypoint==null) ? "#16a34a" : "#dc2626";
 
         ctx.fill();
 
@@ -377,9 +386,17 @@ function getCurrentFloorSegment(){
 
 }
 
-function showCurrentSegment(){
+function loadCurrentSegment(){
 
     currentFloor = floorSegments[currentSegmentIndex].floor;
+
+    currentFloorPath = floorSegments[currentSegmentIndex].path;
+
+    currentWaypointIndex = 0;
+
+    currentWaypoint = currentFloorPath[0];
+
+    nextWaypoint = currentFloorPath[1] ?? null;
 
     loadFloor(currentFloor);
 
@@ -387,7 +404,11 @@ function showCurrentSegment(){
 
 function nextFloor(){
 
+    waitingForQr = false;
+
     if(currentSegmentIndex >= floorSegments.length-1){
+
+        routeCompleted();
 
         return;
 
@@ -395,18 +416,138 @@ function nextFloor(){
 
     currentSegmentIndex++;
 
-    showCurrentSegment();
+    loadCurrentSegment();
+
+}
+
+function reachedTransition(){
+
+    waitingForQr = true;
+
+    document
+        .getElementById("transitionOverlay")
+        .classList.remove("hidden");
+
+    let nextFloorName="";
+
+    if(currentSegmentIndex+1 < floorSegments.length){
+
+        nextFloorName = floorSegments[currentSegmentIndex+1].floor;
+
+    }
+
+    document
+        .getElementById("transitionMessage")
+        .innerHTML=
+
+        `
+        <div class="text-xl font-bold mb-3">
+
+        Floor Transition
+
+        </div>
+
+        <div>
+
+        Go upstairs.
+
+        </div>
+
+        <div class="mt-2">
+
+        Scan the QR code on Floor ${nextFloorName}.
+
+        </div>
+        `;
+
+}
+
+function showTransitionScreen(transition){
+
+    document.getElementById("transitionOverlay")
+
+    .classList.remove("hidden");
+
+    document.getElementById("transitionMessage")
+
+    .innerHTML=
+
+    transition.message;
 
 }
 
 function routeCompleted(){
 
-    document
+    document.getElementById("routeProgress").innerHTML=
 
-    .getElementById("routeProgress")
+    "✓ Destination Reached";
 
-    .innerHTML=
+    document.getElementById("distanceLabel").innerHTML="0 steps";
 
-    "Destination reached.";
+}
+
+function moveToNextWaypoint(){
+
+    if(waitingForQr){
+
+        return;
+
+    }
+
+    if(currentWaypointIndex >= currentFloorPath.length-1){
+
+        if(currentSegmentIndex < floorSegments.length-1){
+
+            reachedTransition();
+
+        }else{
+
+            routeCompleted();
+
+        }
+
+        return;
+
+    }
+
+    currentWaypointIndex++;
+
+    updateNavigationProgress();
+
+}
+
+setInterval(function(){
+
+    arrowPulse+=0.25;
+
+    redraw();
+
+},100);
+
+setInterval(function(){
+
+    if(waitingForQr){
+
+        return;
+
+    }
+
+    if(shortestPath.length==0){
+
+        return;
+
+    }
+
+    moveToNextWaypoint();
+
+},5000);
+
+function updateNavigationProgress(){
+
+    currentWaypoint = currentFloorPath[currentWaypointIndex];
+
+    nextWaypoint = currentFloorPath[currentWaypointIndex+1] ?? null;
+
+    redraw();
 
 }

@@ -14,13 +14,13 @@ async function openCamera(){
 
         });
 
-        document
-        .getElementById("cameraContainer")
-        .classList.remove("hidden");
+        document.getElementById("cameraContainer").classList.remove("hidden");
 
-        document
-        .getElementById("camera")
-        .srcObject = cameraStream;
+        document.getElementById("camera").srcObject = cameraStream;
+
+        updateAROverlay();
+
+        console.log("AR Navigation Ready");
 
     }
 
@@ -46,8 +46,40 @@ function closeCamera(){
 
     }
 
-    document
-    .getElementById("cameraContainer")
-    .classList.add("hidden");
+    document.getElementById("cameraContainer").classList.add("hidden");
 
 }
+
+
+function updateAROverlay(){
+
+    document.getElementById("arFloor").innerHTML=
+
+    document.getElementById("currentFloor").innerHTML;
+
+    document.getElementById("arDistance").innerHTML=
+
+    document.getElementById("distanceLabel").innerHTML;
+
+}
+
+
+setInterval(function(){
+
+    let arrow=document.getElementById("arArrow");
+
+    if(!arrow) return;
+
+    arrow.style.transform=
+
+    "translateY(-8px)";
+
+    setTimeout(function(){
+
+        arrow.style.transform=
+
+        "translateY(8px)";
+
+    },400);
+
+},800);
